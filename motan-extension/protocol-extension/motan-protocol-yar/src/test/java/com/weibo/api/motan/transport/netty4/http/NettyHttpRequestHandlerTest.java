@@ -47,7 +47,7 @@ import com.weibo.api.motan.util.MotanSwitcherUtil;
  *
  */
 public class NettyHttpRequestHandlerTest {
-    public static JUnit4Mockery mockery = null;
+    /*public static JUnit4Mockery mockery = null;
 
     @Before
     public void setUp() throws Exception {
@@ -148,5 +148,5 @@ public class NettyHttpRequestHandlerTest {
         FullHttpRequest httpReqeust = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, requestPath, buf);
         return httpReqeust;
     }
-
+*/
 }
