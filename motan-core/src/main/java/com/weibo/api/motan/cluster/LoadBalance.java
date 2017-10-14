@@ -33,12 +33,32 @@ import com.weibo.api.motan.rpc.Request;
 @Spi(scope = Scope.PROTOTYPE)
 public interface LoadBalance<T> {
 
+    /**
+     * 当可用的应用列表变化时会调用这个方法刷新（motan的可用引用列表是基于服务发现这种模式实现，目前实现了consul&zk）
+     * @param referers
+     */
     void onRefresh(List<Referer<T>> referers);
 
+    /**
+     * 基于负载均衡的策略选择可用的引用
+     * @param request
+     * @return
+     */
     Referer<T> select(Request request);
 
+    /**
+     * FailoverHaStrategy会使用到这个，多线程场景
+     * @param request
+     * @param refersHolder
+     */
     void selectToHolder(Request request, List<Referer<T>> refersHolder);
 
+    /**
+     * ?? 仅仅属于WeightLoadBalance的特性，定义在最上层接口是否合适？？
+     * cluster.getLoadBalance().setWeightString(weights); 这里使用的时候判断一下类型，对WeightLoadBalance这种类型单独处理向下转型是否可以？
+     * 或者是否有其他更好的办法？？
+     * @param weightString
+     */
     void setWeightString(String weightString);
 
 }
