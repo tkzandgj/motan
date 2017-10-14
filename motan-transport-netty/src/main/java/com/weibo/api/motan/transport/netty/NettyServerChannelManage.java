@@ -43,6 +43,12 @@ public class NettyServerChannelManage extends SimpleChannelHandler {
 		this.maxChannel = maxChannel;
 	}
 
+	/**
+	 * 保存连接的channel
+	 * @param ctx
+	 * @param e
+	 * @throws Exception
+	 */
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		Channel channel = ctx.getChannel();
@@ -62,6 +68,12 @@ public class NettyServerChannelManage extends SimpleChannelHandler {
 		}
 	}
 
+	/**
+	 * 连接断开之后，移除无效的channel
+	 * @param ctx
+	 * @param e
+	 * @throws Exception
+	 */
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		Channel channel = ctx.getChannel();
