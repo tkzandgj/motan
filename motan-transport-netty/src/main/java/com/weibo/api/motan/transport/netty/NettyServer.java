@@ -133,12 +133,12 @@ public class NettyServer extends AbstractServer implements StatisticCallback {
 						new DefaultThreadFactory("NettyServer-" + url.getServerPortStr(), true));
 		standardThreadExecutor.prestartAllCoreThreads();
 
-		// 连接数的管理，进行最大连接数的限制 
+		// 连接数的管理，进行最大连接数的限制
 		channelManage = new NettyServerChannelManage(maxServerConnection);
 
 		bootstrap = new ServerBootstrap(channelFactory);
 		bootstrap.setOption("child.tcpNoDelay", true);
-		bootstrap.setOption("child.keepAlive", true);
+		bootstrap.setOption("child.keepAlive", true);  // TCP层面保持一个长链接
 
 		final NettyChannelHandler handler = new NettyChannelHandler(NettyServer.this, messageHandler,
 				standardThreadExecutor);
