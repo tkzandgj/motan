@@ -112,6 +112,7 @@ public class NettyChannelHandler extends SimpleChannelHandler {
 				@Override
                 public void run() {
 				    try{
+				    	// 保存RpcContext的上下文
 				        RpcContext.init(request);
 	                    processRequest(ctx, request, processStartTime);
 				    }finally{
