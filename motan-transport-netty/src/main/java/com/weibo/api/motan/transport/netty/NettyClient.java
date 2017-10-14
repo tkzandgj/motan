@@ -100,6 +100,9 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 		maxClientConnection = url.getIntParameter(URLParamType.maxClientConnection.getName(),
 				URLParamType.maxClientConnection.getIntValue());
 
+		/**
+		 * 定时回收超时任务
+		 */
 		timeMonitorFuture = scheduledExecutor.scheduleWithFixedDelay(
 				new TimeoutMonitor("timeout_monitor_" + url.getHost() + "_" + url.getPort()),
 				MotanConstants.NETTY_TIMEOUT_TIMER_PERIOD, MotanConstants.NETTY_TIMEOUT_TIMER_PERIOD,
@@ -112,7 +115,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 			throw new MotanServiceException("NettyChannel is unavaliable: url=" + url.getUri()
 					+ MotanFrameworkUtil.toString(request));
 		}
-		boolean isAsync = false;
+		boolean isAsync = false;   // 异步请求标识
 		Object async = RpcContext.getContext().getAttribute(MotanConstants.ASYNC_SUFFIX);
 		if(async != null && async instanceof Boolean){
 		    isAsync = (Boolean)async;
@@ -236,7 +239,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 	private void initClientBootstrap() {
 		bootstrap = new ClientBootstrap(channelFactory);
 		
-		bootstrap.setOption("keepAlive", true);
+		bootstrap.setOption("keepAlive", true);   // TCP层面的长链接
 		bootstrap.setOption("tcpNoDelay", true);
 
 		// 实际上，极端情况下，connectTimeout会达到500ms，因为netty nio的实现中，是依赖BossThread来控制超时，
@@ -246,7 +249,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
             throw new MotanFrameworkException("NettyClient init Error: timeout(" + timeout + ") <= 0 is forbid.",
                     MotanErrorMsgConstant.FRAMEWORK_INIT_ERROR);
         }
-		bootstrap.setOption("connectTimeoutMillis", timeout);
+		bootstrap.setOption("connectTimeoutMillis", timeout);  // 设置连接超时时间
 
 		// 最大响应包限制
 		final int maxContentLength = url.getIntParameter(URLParamType.maxContentLength.getName(),
