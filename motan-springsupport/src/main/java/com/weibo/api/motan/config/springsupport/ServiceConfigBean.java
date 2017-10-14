@@ -61,6 +61,10 @@ public class ServiceConfigBean<T> extends ServiceConfig<T>
         unexport();
     }
 
+    /**
+     * 初始化操作
+     * @throws Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
 
