@@ -44,7 +44,13 @@ import com.weibo.api.motan.util.LoggerUtil;
 public class ZookeeperRegistry extends CommandFailbackRegistry implements Closable {
     private ZkClient zkClient;
     private Set<URL> availableServices = new ConcurrentHashSet<URL>();
+    /**
+     * IZkChildListener：znode子节点事件侦听器，当ZkClient接收到某个path节点变更或者子节点变更事件的时候，会触发listener
+     */
     private ConcurrentHashMap<URL, ConcurrentHashMap<ServiceListener, IZkChildListener>> serviceListeners = new ConcurrentHashMap<URL, ConcurrentHashMap<ServiceListener, IZkChildListener>>();
+    /**
+     * IZkDataListener：znode的数据事件监听器，当数据发生变化的时候，会触发listener
+     */
     private ConcurrentHashMap<URL, ConcurrentHashMap<CommandListener, IZkDataListener>> commandListeners = new ConcurrentHashMap<URL, ConcurrentHashMap<CommandListener, IZkDataListener>>();
     private final ReentrantLock clientLock = new ReentrantLock();
     private final ReentrantLock serverLock = new ReentrantLock();
@@ -61,7 +67,9 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
             @Override
             public void handleNewSession() throws Exception {
                 LoggerUtil.info("zkRegistry get new session notify.");
+                // 服务端重连
                 reconnectService();
+                // 客户端重连
                 reconnectClient();
             }
         };
@@ -77,6 +85,11 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         return commandListeners;
     }
 
+    /**
+     * 订阅服务
+     * @param url
+     * @param serviceListener
+     */
     @Override
     protected void subscribeService(final URL url, final ServiceListener serviceListener) {
         try {
@@ -168,6 +181,11 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         }
     }
 
+    /**
+     * 取消订阅
+     * @param url
+     * @param commandListener
+     */
     @Override
     protected void unsubscribeCommand(URL url, CommandListener commandListener) {
         try {
@@ -215,6 +233,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         }
     }
 
+    /**
+     * 注册节点
+     * @param url
+     */
     @Override
     protected void doRegister(URL url) {
         try {
@@ -230,6 +252,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         }
     }
 
+    /**
+     * 删除节点
+     * @param url
+     */
     @Override
     protected void doUnregister(URL url) {
         try {
@@ -307,8 +333,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
     private void createNode(URL url, ZkNodeType nodeType) {
         String nodeTypePath = ZkUtils.toNodeTypePath(url, nodeType);
         if (!zkClient.exists(nodeTypePath)) {
+            // 创建持久化节点
             zkClient.createPersistent(nodeTypePath, true);
         }
+        // 创建临时节点
         zkClient.createEphemeral(ZkUtils.toNodePath(url, nodeType), url.toFullStr());
     }
 
@@ -318,8 +346,12 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
             zkClient.delete(nodePath);
         }
     }
-    
+
+    /**
+     * 重连服务
+     */
     private void reconnectService() {
+        // 获取到注册的服务地址
         Collection<URL> allRegisteredServices = getRegisteredServiceUrls();
         if (allRegisteredServices != null && !allRegisteredServices.isEmpty()) {
             try {
