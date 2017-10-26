@@ -47,7 +47,13 @@ public abstract class AbstractRegistry implements Registry {
             new ConcurrentHashMap<URL, Map<String, List<URL>>>();
 
     private URL registryUrl;
+    /**
+     * 保存已经注册的服务节点
+     */
     private Set<URL> registeredServiceUrls = new ConcurrentHashSet<URL>();
+    /**
+     * 保存已经注册的类的名称
+     */
     protected String registryClassName = this.getClass().getSimpleName();
 
     public AbstractRegistry(URL url) {
@@ -174,6 +180,12 @@ public abstract class AbstractRegistry implements Registry {
         }
     }
 
+
+    /**
+     * 获取本地缓存的url
+     * @param url
+     * @return
+     */
     protected List<URL> getCachedUrls(URL url) {
         Map<String, List<URL>> rsUrls = subscribedCategoryResponses.get(url);
         if (rsUrls == null || rsUrls.size() == 0) {
