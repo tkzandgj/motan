@@ -68,6 +68,7 @@ public abstract class FailbackRegistry extends AbstractRegistry {
     public FailbackRegistry(URL url) {
         super(url);
         long retryPeriod = url.getIntParameter(URLParamType.registryRetryPeriod.getName(), URLParamType.registryRetryPeriod.getIntValue());
+        // 按照固定的时间频率去执行任务计划
         retryExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -81,8 +82,13 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }, retryPeriod, retryPeriod, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * 注册节点
+     * @param url
+     */
     @Override
     public void register(URL url) {
+        // 移除注册失败的节点
         failedRegistered.remove(url);
         failedUnregistered.remove(url);
 
@@ -96,6 +102,10 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }
     }
 
+    /**
+     * 取消注册节点
+     * @param url
+     */
     @Override
     public void unregister(URL url) {
         failedRegistered.remove(url);
@@ -111,6 +121,11 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         }
     }
 
+    /**
+     * 订阅
+     * @param url
+     * @param listener
+     */
     @Override
     public void subscribe(URL url, NotifyListener listener) {
         removeForFailedSubAndUnsub(url, listener);
