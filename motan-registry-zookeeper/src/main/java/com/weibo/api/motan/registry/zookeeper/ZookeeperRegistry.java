@@ -43,6 +43,9 @@ import com.weibo.api.motan.util.LoggerUtil;
 
 public class ZookeeperRegistry extends CommandFailbackRegistry implements Closable {
     private ZkClient zkClient;
+    /**
+     * 记录有效的服务节点信息
+     */
     private Set<URL> availableServices = new ConcurrentHashSet<URL>();
     /**
      * IZkChildListener：znode子节点事件侦听器，当ZkClient接收到某个path节点变更或者子节点变更事件的时候，会触发listener
@@ -269,6 +272,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         }
     }
 
+    /**
+     * 添加服务节点
+     * @param url
+     */
     @Override
     protected void doAvailable(URL url) {
         try{
@@ -291,6 +298,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
         }
     }
 
+    /**
+     * 删除服务节点
+     * @param url
+     */
     @Override
     protected void doUnavailable(URL url) {
         try{
