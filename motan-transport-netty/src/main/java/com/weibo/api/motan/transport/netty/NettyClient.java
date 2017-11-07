@@ -102,6 +102,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 
 		/**
 		 * 定时回收超时任务
+		 * 每次都要把任务执行完成之后再延迟固定时间之后再执行下一次任务
 		 */
 		timeMonitorFuture = scheduledExecutor.scheduleWithFixedDelay(
 				new TimeoutMonitor("timeout_monitor_" + url.getHost() + "_" + url.getPort()),
@@ -240,7 +241,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 		bootstrap = new ClientBootstrap(channelFactory);
 		
 		bootstrap.setOption("keepAlive", true);   // TCP层面的长链接
-		bootstrap.setOption("tcpNoDelay", true);
+		bootstrap.setOption("tcpNoDelay", true);  // forbid use TCP parameter NoDelay Algorithm
 
 		// 实际上，极端情况下，connectTimeout会达到500ms，因为netty nio的实现中，是依赖BossThread来控制超时，
 		// 如果为了严格意义的timeout，那么需要应用端进行控制。
