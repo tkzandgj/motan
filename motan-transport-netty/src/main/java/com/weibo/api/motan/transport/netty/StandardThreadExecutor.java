@@ -97,6 +97,9 @@ public class StandardThreadExecutor extends ThreadPoolExecutor {
 	}
 
 	public void execute(Runnable command) {
+		/**
+		 * 保存正在处理的任务的数量
+ 		 */
 		int count = submittedTasksCount.incrementAndGet();
 
 		// 超过最大的并发任务限制，进行 reject
