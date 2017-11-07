@@ -38,6 +38,10 @@ import com.weibo.api.motan.util.LoggerUtil;
  * 
  * @author maijunsheng
  * @version 创建时间：2013-5-31
+ *
+ * Netty从3.x升级到4.x之后
+ * upstream     ------>   inbound    相当于Handler接收数据
+ * downstream   ------>   outbound   相当于Handler发送数据
  * 
  */
 public class NettyDecoder extends FrameDecoder {
@@ -58,22 +62,44 @@ public class NettyDecoder extends FrameDecoder {
 			return null;
 		}
 
+		// 标记当前缓冲区读的位置索引
 		buffer.markReaderIndex();
 
+		/**
+		 * 返回当前readerIndex处的short值，并将readerIndex增加2
+		 */
 		short type = buffer.readShort();
 		
 		if (type != MotanConstants.NETTY_MAGIC_TYPE) {
+			/**
+			 * 重置缓冲区读的索引，方便以后读取数据。
+			 */
 			buffer.resetReaderIndex();
 			throw new MotanFrameworkException("NettyDecoder transport header not support, type: " + type);
 		}
 
+		/**
+		 * 返回当前readerIndex处的short值，并将readerIndex增加2
+		 */
 		byte messageType = (byte) buffer.readShort();
+		/**
+		 * 返回当前readerIndex处的long值，并将readerIndex增加8
+		 */
 		long requestId = buffer.readLong();
 
+		/**
+		 * 返回当前readerIndex的int值，并将readerIndex增加4
+		 */
 		int dataLength = buffer.readInt();
 
 		// FIXME 如果dataLength过大，可能导致问题
+		/**
+		 * 返回可被读取的字节数
+		 */
 		if (buffer.readableBytes() < dataLength) {
+			/**
+			 * 重置缓冲区读的索引，方便以后读取数据。
+			 */
 			buffer.resetReaderIndex();
 			return null;
 		}
@@ -98,6 +124,9 @@ public class NettyDecoder extends FrameDecoder {
 		
 		byte[] data = new byte[dataLength];
 
+		/**
+		 * 把buffer中的数据读到data字节数组中
+		 */
 		buffer.readBytes(data);
 
 		try {
