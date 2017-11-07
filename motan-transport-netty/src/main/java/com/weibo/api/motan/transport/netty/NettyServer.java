@@ -137,7 +137,7 @@ public class NettyServer extends AbstractServer implements StatisticCallback {
 		channelManage = new NettyServerChannelManage(maxServerConnection);
 
 		bootstrap = new ServerBootstrap(channelFactory);
-		bootstrap.setOption("child.tcpNoDelay", true);
+		bootstrap.setOption("child.tcpNoDelay", true);   // 设置服务端禁用NoDelay算法，数据来一条传输一条，不是等到一定长度的时候在去做处理
 		bootstrap.setOption("child.keepAlive", true);  // TCP层面保持一个长链接
 
 		final NettyChannelHandler handler = new NettyChannelHandler(NettyServer.this, messageHandler,
