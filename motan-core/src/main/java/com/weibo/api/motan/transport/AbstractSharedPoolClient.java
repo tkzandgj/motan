@@ -84,7 +84,7 @@ public abstract class AbstractSharedPoolClient extends AbstractClient {
     }
 
     protected Channel getChannel() throws MotanServiceException {
-        int index = MathUtil.getPositive(idx.getAndIncrement());
+        int index = MathUtil.getNonNegative(idx.getAndIncrement());
         Channel channel;
 
         for (int i = index; i < connections + index; i++) {
@@ -99,5 +99,11 @@ public abstract class AbstractSharedPoolClient extends AbstractClient {
         String errorMsg = this.getClass().getSimpleName() + " getChannel Error: url=" + url.getUri();
         LoggerUtil.error(errorMsg);
         throw new MotanServiceException(errorMsg);
+    }
+
+    protected void closeAllChannels() {
+        for (Channel channel : channels) {
+            channel.close();
+        }
     }
 }

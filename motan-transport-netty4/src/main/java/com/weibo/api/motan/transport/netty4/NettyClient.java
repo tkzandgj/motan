@@ -33,7 +33,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
     /**
      * 回收过期任务
      */
-    private static ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
+    private static ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
     /**
      * 异步的request，需要注册callback future
      * 触发remove的操作有： 1) service的返回结果处理。 2) timeout thread cancel
@@ -222,6 +222,8 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
             callbackMap.clear();
             // 设置close状态
             state = ChannelState.CLOSE;
+            // 关闭client持有的channel
+            closeAllChannels();
             // 解除统计回调的注册
             StatsUtil.unRegistryStatisticCallback(this);
             LoggerUtil.info("NettyClient close Success: url={}", url.getUri());
